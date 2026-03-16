@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Challenge</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#5f9cff,#8f5cff);
+color:white;
+}
+
+.container{
+text-align:center;
+background:rgba(255,255,255,0.15);
+padding:40px;
+border-radius:20px;
+width:380px;
+backdrop-filter:blur(12px);
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+h1{
+margin-bottom:10px;
+}
+
+button{
+margin-top:15px;
+padding:12px 25px;
+border:none;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;
+background:white;
+color:#333;
+transition:0.2s;
+}
+
+button:hover{
+transform:scale(1.08);
+}
+
+.challenge{
+margin-top:25px;
+font-size:20px;
+min-height:50px;
+}
+
+.streak{
+margin-top:20px;
+font-size:16px;
+}
+
+.share{
+margin-top:10px;
+background:#ffdf5e;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+pointer-events:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<div class="container">
+
+<h1>🎯 Daily Challenge</h1>
+
+<p>Click to get your challenge!</p>
+
+<button onclick="generateChallenge()">Get Challenge</button>
+
+<div class="challenge" id="challenge">
+Your challenge will appear here 👇
+</div>
+
+<div class="streak">
+🔥 Streak: <span id="streak">0</span> days
+</div>
+
+<button class="share" onclick="shareChallenge()">Share Challenge</button>
+
+</div>
+
+<script>
+
+const challenges = [
+
+"Do 20 pushups 💪",
+"Drink 2 glasses of water 💧",
+"Walk for 10 minutes 🚶",
+"Read 5 pages of a book 📖",
+"Learn 3 new English words 🌍",
+"Compliment someone today 😊",
+"Draw something in 5 minutes 🎨",
+"Stretch for 2 minutes 🤸",
+"Watch an educational video 🎥",
+"Write 3 things you're grateful for ✨",
+"Clean your desk 🧹",
+"Listen to a new song 🎧",
+"Learn a keyboard shortcut ⌨️",
+"Message an old friend 📱",
+"Try learning a magic trick 🪄"
+
+];
+
+function generateChallenge(){
+
+const random = Math.floor(Math.random()*challenges.length);
+
+const challenge = challenges[random];
+
+document.getElementById("challenge").innerText = challenge;
+
+updateStreak();
+
+confetti();
+
+}
+
+function updateStreak(){
+
+let streak = localStorage.getItem("streak") || 0;
+
+streak++;
+
+localStorage.setItem("streak",streak);
+
+document.getElementById("streak").innerText = streak;
+
+}
+
+document.getElementById("streak").innerText = localStorage.getItem("streak") || 0;
+
+function shareChallenge(){
+
+const text = document.getElementById("challenge").innerText;
+
+if(navigator.share){
+
+navigator.share({
+title:"Daily Challenge",
+text:text
+});
+
+}else{
+
+alert("Share this challenge with friends:\n\n"+text);
+
+}
+
+}
+
+function confetti(){
+
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+for(let i=0;i<120;i++){
+
+ctx.fillStyle = "hsl(" + Math.random()*360 + ",100%,50%)";
+
+ctx.beginPath();
+
+ctx.arc(Math.random()*canvas.width,
+Math.random()*canvas.height,
+5,
+0,
+Math.PI*2);
+
+ctx.fill();
+
+}
+
+setTimeout(()=>{
+ctx.clearRect(0,0,canvas.width,canvas.height);
+},800);
+
+}
+
+</script>
+
+</body>
+</html>
