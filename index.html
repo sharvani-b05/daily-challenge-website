@@ -4,77 +4,74 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Daily Challenge</title>
+<title>Daily Quiz & Tasks</title>
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, sans-serif;
-}
-
 body{
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#667eea,#764ba2);
 height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:linear-gradient(135deg,#5f9cff,#8f5cff);
+margin:0;
 color:white;
 }
 
 .container{
-text-align:center;
 background:rgba(255,255,255,0.15);
 padding:40px;
 border-radius:20px;
-width:380px;
-backdrop-filter:blur(12px);
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
+width:420px;
+text-align:center;
+backdrop-filter:blur(10px);
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
-h1{
+h2{
 margin-bottom:10px;
 }
 
 button{
-margin-top:15px;
-padding:12px 25px;
+margin-top:10px;
+padding:10px;
+width:100%;
 border:none;
 border-radius:8px;
-font-size:16px;
 cursor:pointer;
+font-size:16px;
+}
+
+.option{
 background:white;
-color:#333;
-transition:0.2s;
+color:black;
 }
 
-button:hover{
-transform:scale(1.08);
+.option:hover{
+background:#f0f0f0;
 }
 
-.challenge{
-margin-top:25px;
-font-size:20px;
-min-height:50px;
+.next{
+background:#ffd54f;
 }
 
-.streak{
+.task{
+background:#4caf50;
+color:white;
+}
+
+.score{
+margin-top:15px;
+font-size:18px;
+}
+
+.task-box{
 margin-top:20px;
 font-size:16px;
-}
-
-.share{
-margin-top:10px;
-background:#ffdf5e;
-}
-
-canvas{
-position:fixed;
-top:0;
-left:0;
-pointer-events:none;
+background:rgba(255,255,255,0.2);
+padding:15px;
+border-radius:10px;
 }
 
 </style>
@@ -83,128 +80,134 @@ pointer-events:none;
 
 <body>
 
-<canvas id="confetti"></canvas>
-
 <div class="container">
 
-<h1>🎯 Daily Challenge</h1>
+<h2>🧠 Daily Quiz</h2>
 
-<p>Click to get your challenge!</p>
+<p id="question">Question loading...</p>
 
-<button onclick="generateChallenge()">Get Challenge</button>
+<div id="answers"></div>
 
-<div class="challenge" id="challenge">
-Your challenge will appear here 👇
+<button class="next" onclick="nextQuestion()">Next Question</button>
+
+<div class="score">
+Score: <span id="score">0</span>
 </div>
 
-<div class="streak">
-🔥 Streak: <span id="streak">0</span> days
-</div>
+<h2 style="margin-top:25px;">🎯 Daily Task</h2>
 
-<button class="share" onclick="shareChallenge()">Share Challenge</button>
+<button class="task" onclick="generateTask()">Get Task</button>
+
+<div class="task-box" id="task">
+Your task will appear here
+</div>
 
 </div>
 
 <script>
 
-const challenges = [
+const quiz=[
 
-"Do 20 pushups 💪",
-"Drink 2 glasses of water 💧",
-"Walk for 10 minutes 🚶",
-"Read 5 pages of a book 📖",
-"Learn 3 new English words 🌍",
-"Compliment someone today 😊",
-"Draw something in 5 minutes 🎨",
-"Stretch for 2 minutes 🤸",
-"Watch an educational video 🎥",
-"Write 3 things you're grateful for ✨",
-"Clean your desk 🧹",
-"Listen to a new song 🎧",
-"Learn a keyboard shortcut ⌨️",
-"Message an old friend 📱",
-"Try learning a magic trick 🪄"
+{
+q:"What does HTML stand for?",
+a:["Hyper Text Markup Language","High Text Machine Language","Hyper Tool Multi Language","None"],
+correct:0
+},
+
+{
+q:"Which language styles websites?",
+a:["HTML","CSS","Python","C++"],
+correct:1
+},
+
+{
+q:"Which language runs in the browser?",
+a:["Java","C","JavaScript","Python"],
+correct:2
+},
+
+{
+q:"What does CPU stand for?",
+a:["Central Processing Unit","Computer Personal Unit","Central Print Unit","Control Unit"],
+correct:0
+},
+
+{
+q:"Which company developed JavaScript?",
+a:["Google","Netscape","Apple","IBM"],
+correct:1
+}
 
 ];
 
-function generateChallenge(){
+const tasks=[
 
-const random = Math.floor(Math.random()*challenges.length);
+"Write one goal for today.",
+"Learn one new JavaScript concept.",
+"Read 5 pages of a book.",
+"Practice typing for 5 minutes.",
+"Think of one startup idea.",
+"Write a small HTML webpage.",
+"Explain the internet in simple words.",
+"Help someone today.",
+"Learn 3 new English words.",
+"Organize your computer files."
 
-const challenge = challenges[random];
+];
 
-document.getElementById("challenge").innerText = challenge;
+let current;
+let score=0;
 
-updateStreak();
+function loadQuestion(){
 
-confetti();
+current=Math.floor(Math.random()*quiz.length);
 
-}
+document.getElementById("question").innerText=quiz[current].q;
 
-function updateStreak(){
+let answersHTML="";
 
-let streak = localStorage.getItem("streak") || 0;
+quiz[current].a.forEach((option,index)=>{
 
-streak++;
+answersHTML+=`<button class="option" onclick="checkAnswer(${index})">${option}</button>`;
 
-localStorage.setItem("streak",streak);
-
-document.getElementById("streak").innerText = streak;
-
-}
-
-document.getElementById("streak").innerText = localStorage.getItem("streak") || 0;
-
-function shareChallenge(){
-
-const text = document.getElementById("challenge").innerText;
-
-if(navigator.share){
-
-navigator.share({
-title:"Daily Challenge",
-text:text
 });
+
+document.getElementById("answers").innerHTML=answersHTML;
+
+}
+
+function checkAnswer(index){
+
+if(index===quiz[current].correct){
+
+score++;
+document.getElementById("score").innerText=score;
+alert("Correct 🎉");
 
 }else{
 
-alert("Share this challenge with friends:\n\n"+text);
+alert("Wrong ❌");
 
 }
 
 }
 
-function confetti(){
+function nextQuestion(){
+loadQuestion();
+}
 
-const canvas = document.getElementById("confetti");
-const ctx = canvas.getContext("2d");
+function generateTask(){
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const random=Math.floor(Math.random()*tasks.length);
 
-for(let i=0;i<120;i++){
-
-ctx.fillStyle = "hsl(" + Math.random()*360 + ",100%,50%)";
-
-ctx.beginPath();
-
-ctx.arc(Math.random()*canvas.width,
-Math.random()*canvas.height,
-5,
-0,
-Math.PI*2);
-
-ctx.fill();
+document.getElementById("task").innerText=tasks[random];
 
 }
 
-setTimeout(()=>{
-ctx.clearRect(0,0,canvas.width,canvas.height);
-},800);
-
-}
+loadQuestion();
 
 </script>
 
 </body>
 </html>
+
